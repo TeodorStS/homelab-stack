@@ -1,0 +1,13 @@
+services:
+  gitea:
+    image: gitea/gitea:latest
+    container_name: gitea
+    restart: always
+    ports:
+      - "3002:3000"
+      - "222:22"
+    volumes:
+      - ./data:/data
+    environment:
+      - APP_NAME=Homelab Gitea
+      - RUN_MODE=prod

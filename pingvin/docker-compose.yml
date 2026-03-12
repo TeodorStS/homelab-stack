@@ -1,0 +1,9 @@
+services:
+  pingvin-share:
+    image: stonith404/pingvin-share:latest
+    container_name: pingvin-share
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/opt/app/backend/data
