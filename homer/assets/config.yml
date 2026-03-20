@@ -1,0 +1,40 @@
+title: "Homelab Dashboard"
+subtitle: "Self-hosted infrastructure"
+logo: "logo.png"
+
+header: true
+footer: false
+
+services:
+  - name: "Monitoring"
+    icon: "fas fa-heartbeat"
+    items:
+      - name: "Uptime Kuma"
+        logo: "https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.svg"
+        subtitle: "Service monitoring"
+        url: "http://status.40.66.42.189.nip.io"
+        target: "_blank"
+
+  - name: "Infrastructure"
+    icon: "fas fa-server"
+    items:
+      - name: "Portainer"
+        subtitle: "Docker management"
+        url: "http://portainer.40.66.42.189.nip.io"
+        target: "_blank"
+
+  - name: "Services"
+    icon: "fas fa-th"
+    items:
+      - name: "Gitea"
+        subtitle: "Self-hosted Git"
+        url: "http://git.40.66.42.189.nip.io"
+        target: "_blank"
+      - name: "Pingvin Share"
+        subtitle: "File sharing"
+        url: "http://files.40.66.42.189.nip.io"
+        target: "_blank"
+      - name: "Vaultwarden"
+        subtitle: "Password manager"
+        url: "http://vault.40.66.42.189.nip.io"
+        target: "_blank"
