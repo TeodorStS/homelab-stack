@@ -38,3 +38,9 @@ fail authentication repeatedly.
 
 ### Config location
 `/etc/fail2ban/jail.local`
+
+## Server Deployment Notes
+- UFW and fail2ban configured on Azure VM (France Central)
+- Server IP: 40.66.42.189
+- All services accessible via nip.io subdomains
+- Docker bridge network (172.17.0.1) used for Nginx proxy pass
