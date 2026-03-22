@@ -10,13 +10,13 @@ service management, and server hardening.
 
 | Service | URL | Purpose |
 |---|---|---|
-| Homer | http://dash.40.66.42.189.nip.io | Dashboard homepage |
-| Uptime Kuma | http://status.40.66.42.189.nip.io | Service monitoring |
-| Pingvin Share | http://files.40.66.42.189.nip.io | File sharing |
-| Gitea | http://git.40.66.42.189.nip.io | Self-hosted Git server |
-| Vaultwarden | http://vault.40.66.42.189.nip.io | Password manager |
-| Portainer | http://portainer.40.66.42.189.nip.io | Docker management UI |
-| Grafana | http://grafana.40.66.42.189.nip.io | Metrics dashboards |
+| Homer | https://dash.40.66.42.189.nip.io | Dashboard homepage |
+| Uptime Kuma | https://status.40.66.42.189.nip.io | Service monitoring |
+| Pingvin Share | https://files.40.66.42.189.nip.io | File sharing |
+| Gitea | https://git.40.66.42.189.nip.io | Self-hosted Git server |
+| Vaultwarden | https://vault.40.66.42.189.nip.io | Password manager |
+| Portainer | https://portainer.40.66.42.189.nip.io | Docker management UI |
+| Grafana | https://grafana.40.66.42.189.nip.io | Metrics dashboards |
 
 ## Architecture
 ```
@@ -109,14 +109,14 @@ git clone https://github.com/TeodorStS/homelab-stack.git
 - [x] UFW firewall hardening
 - [x] Fail2ban brute force protection
 - [x] 2GB swap file
+- [x] SSL certificates via Let's Encrypt (HTTPS for all services)
 
 ### Next Steps
-- [ ] SSL certificates via Let's Encrypt (HTTPS for all services)
+- [ ] Add automated backups
 - [ ] Authelia — two factor authentication layer
 - [ ] Woodpecker CI + Gitea — full CI/CD pipeline
 - [ ] Nginx Proxy Manager — visual UI for managing reverse proxy
 - [ ] Migrate to permanent domain name
-- [ ] Add automated backups
 - [ ] Upgrade to larger server for Grafana + cAdvisor
 
 ## What I Learned
