@@ -7,3 +7,9 @@ services:
       - "8082:8080"
     volumes:
       - ./assets:/www/assets
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

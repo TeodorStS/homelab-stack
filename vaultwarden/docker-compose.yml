@@ -9,3 +9,9 @@ services:
       - ./data:/data
     environment:
       - SIGNUPS_ALLOWED=true
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:80/alive || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s

@@ -7,6 +7,11 @@ services:
       - "3001:3001"
     volumes:
       - uptime-kuma-data:/app/data
-
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
 volumes:
   uptime-kuma-data:
