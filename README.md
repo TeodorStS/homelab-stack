@@ -45,6 +45,7 @@ Internet → UFW Firewall (ports 80, 443, 22 only)
 - **UFW** — firewall blocking everything except ports 22, 80, 443
 - **Fail2ban** — blocks IPs after 5 failed SSH attempts
 - **Swap file** — 2GB swap prevents RAM exhaustion crashes
+- **Healthchecks** — all services monitored internally with automatic restart on failure
 
 ## Running Locally
 
@@ -110,6 +111,7 @@ git clone https://github.com/TeodorStS/homelab-stack.git
 - [x] Fail2ban brute force protection
 - [x] 2GB swap file
 - [x] SSL certificates via Let's Encrypt (HTTPS for all services)
+- [x] Docker healthchecks on all services
 
 ### Next Steps
 - [ ] Add automated backups
