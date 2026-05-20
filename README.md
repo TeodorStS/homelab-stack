@@ -1,7 +1,7 @@
 # homelab-stack
 
 A self-hosted infrastructure stack running multiple services on a real cloud
-server (Azure, France Central), accessible from anywhere in the world.
+server (Hetzner, Nuremberg), accessible from anywhere in the world.
 
 Built to develop real sysadmin skills including Docker, reverse proxying,
 service management, and server hardening.
@@ -10,13 +10,13 @@ service management, and server hardening.
 
 | Service | URL | Purpose |
 |---|---|---|
-| Homer | https://dash.40.66.42.189.nip.io | Dashboard homepage |
-| Uptime Kuma | https://status.40.66.42.189.nip.io | Service monitoring |
-| Pingvin Share | https://files.40.66.42.189.nip.io | File sharing |
-| Gitea | https://git.40.66.42.189.nip.io | Self-hosted Git server |
-| Vaultwarden | https://vault.40.66.42.189.nip.io | Password manager |
-| Portainer | https://portainer.40.66.42.189.nip.io | Docker management UI |
-| Grafana | https://grafana.40.66.42.189.nip.io | Metrics dashboards |
+| Homer | https://dash.116.203.149.96.nip.io | Dashboard homepage |
+| Uptime Kuma | https://status.116.203.149.96.nip.io | Service monitoring |
+| Pingvin Share | https://files.116.203.149.96.nip.io | File sharing |
+| Gitea | https://git.116.203.149.96.nip.io | Self-hosted Git server |
+| Vaultwarden | https://vault.116.203.149.96.nip.io | Password manager |
+| Portainer | https://portainer.116.203.149.96.nip.io | Docker management UI |
+| Grafana | https://grafana.116.203.149.96.nip.io | Metrics dashboards |
 
 ## Architecture
 ```
@@ -38,7 +38,7 @@ Internet → UFW Firewall (ports 80, 443, 22 only)
 
 ## Stack
 
-- **OS:** Ubuntu 24.04 LTS (Azure VM, France Central)
+- **OS:** Ubuntu 24.04 LTS (Hetzner Cloud, Nuremberg)
 - **Docker** — all services run in isolated containers
 - **docker-compose** — each service defined and managed separately
 - **Nginx** — reverse proxy routing traffic via subdomains
@@ -86,6 +86,19 @@ newgrp docker
 
 # Clone and start
 git clone https://github.com/TeodorStS/homelab-stack.git
+
+# Get SSL certificates (stop nginx first)
+cd nginx && docker compose down
+sudo certbot certonly --standalone \
+  -d vault.<SERVER_IP>.nip.io \
+  -d dash.<SERVER_IP>.nip.io \
+  -d status.<SERVER_IP>.nip.io \
+  -d files.<SERVER_IP>.nip.io \
+  -d git.<SERVER_IP>.nip.io \
+  -d portainer.<SERVER_IP>.nip.io \
+  -d grafana.<SERVER_IP>.nip.io \
+  --email your@email.com --agree-tos --non-interactive
+cd .. && make up
 ```
 
 ## Security
@@ -99,7 +112,7 @@ git clone https://github.com/TeodorStS/homelab-stack.git
 ## Roadmap
 
 ### Completed
-- [x] Deploy on real cloud server (Azure)
+- [x] Deploy on real cloud server (Hetzner)
 - [x] Nginx reverse proxy with subdomain routing
 - [x] Uptime Kuma monitoring
 - [x] Pingvin Share file sharing
@@ -113,9 +126,9 @@ git clone https://github.com/TeodorStS/homelab-stack.git
 - [x] 2GB swap file
 - [x] SSL certificates via Let's Encrypt (HTTPS for all services)
 - [x] Docker healthchecks on all services
-- [x] Docker healthchecks on all services
 - [x] Pinned Docker image versions
 - [x] Makefile for service management
+- [x] Migrated from Azure (France Central) to Hetzner (Nuremberg)
 
 ### Next Steps
 - [ ] Add automated backups
@@ -133,6 +146,7 @@ git clone https://github.com/TeodorStS/homelab-stack.git
 - How port mapping and Docker networking works on Linux vs Windows
 - UFW firewall rules and fail2ban configuration
 - How to diagnose and fix server crashes (RAM exhaustion → swap file)
-- How to migrate a local stack to a real cloud server
+- How to migrate a live server stack to a new cloud provider
 - How DNS routing works with subdomains
 - Resource management on constrained servers
+- How SSL certificates work with Let's Encrypt and nip.io
