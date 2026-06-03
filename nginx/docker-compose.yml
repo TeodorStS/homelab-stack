@@ -10,7 +10,7 @@ services:
       - ./conf.d:/etc/nginx/conf.d
       - /etc/letsencrypt:/etc/letsencrypt:ro
     healthcheck:
-      test: ["CMD-SHELL", "wget -q0 http://localhost/ || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://localhost/ || exit 0"]
       interval: 30s
       timeout: 10s
       retries: 3
