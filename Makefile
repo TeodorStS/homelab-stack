@@ -9,6 +9,7 @@ up:
 	cd pingvin && docker compose up -d && cd ..
 	cd portainer && docker compose up -d && cd ..
 	cd homer && docker compose up -d && cd ..
+	cd memos && docker compose up -d && cd ..
 	@echo "All services started!"
 
 down:
@@ -20,6 +21,7 @@ down:
 	cd pingvin && docker compose down && cd ..
 	cd portainer && docker compose down && cd ..
 	cd homer && docker compose down && cd ..
+	cd memos && docker compose down && cd ..
 	@echo "All services stopped!"
 
 status:
@@ -29,3 +31,7 @@ logs:
 	@docker compose ls
 
 restart: down up
+
+disk:
+	free -h
+	df -h /
