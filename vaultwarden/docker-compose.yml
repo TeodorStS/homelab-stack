@@ -8,7 +8,7 @@ services:
     volumes:
       - ./data:/data
     environment:
-      - SIGNUPS_ALLOWED=true
+      - SIGNUPS_ALLOWED=false
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:80/alive || exit 1"]
       interval: 30s
