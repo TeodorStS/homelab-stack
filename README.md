@@ -17,10 +17,8 @@ service management, and server hardening.
 | Vaultwarden | https://vault.116.203.149.96.nip.io | Password manager |
 | Portainer | https://portainer.116.203.149.96.nip.io | Docker management UI |
 | Grafana | https://grafana.116.203.149.96.nip.io | Metrics dashboards |
+| Memos | https://notes.116.203.149.96.nip.io | Notes |
 
-## Known Issues
-
-> ⚠️ **Homer dashboard shows "Not Secure" warning** — Homer loads over HTTPS but triggers a mixed content warning in the browser. The SSL certificate and nginx config are correct; the issue is caused by internal resource links. This is a known bug and will be fixed in a future update.
 
 ## Architecture
 ```
@@ -36,7 +34,8 @@ Internet → UFW Firewall (ports 80, 443, 22 only)
     │  Vaultwarden    :8080       │
     │  Portainer      :9000       │
     │  Grafana        :3003       │
-    │  Prometheus     :9090       │
+    │  Prometheus     :9090       | 
+    │  Memos          :5320       | 
     └─────────────────────────────┘
 ```
 
