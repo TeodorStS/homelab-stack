@@ -1,5 +1,7 @@
 gitea/data/
 pingvin/data/
-.env
-.env
+vaultwarden/data/
+beszel/data/
+beszel/beszel_agent_data/
+homepage/config/
 .env
