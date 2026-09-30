@@ -13,6 +13,7 @@ service management, and server hardening.
 | Beszel | https://dash2.116.203.149.96.nip.io | CPU / RAM / disk / Docker container monitoring |
 | Homepage | https://home.116.203.149.96.nip.io | Dashboard / service homepage |
 | Vaultwarden | http://116.203.149.96:8080 | Password manager (not yet behind Nginx, exposed on raw port) |
+| It-toolkit | https://tools.116.203.149.96.nip.io/ | Usefull it tools |
 
 ## Known Issues
 
