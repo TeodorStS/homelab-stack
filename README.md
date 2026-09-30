@@ -1,157 +1,95 @@
 # homelab-stack
 
-A self-hosted infrastructure stack running multiple services on a real cloud
-server (Hetzner, Nuremberg), accessible from anywhere in the world.
+A self-hosted infrastructure stack running multiple services on a real cloud server (Hetzner, Nuremberg), accessible from anywhere in the world.
 
-Built to develop real sysadmin skills including Docker, reverse proxying,
-service management, and server hardening.
+Built to develop real sysadmin skills including Docker, reverse proxying, service management, and server hardening.
 
 ## Live Services
 
-| Service | URL | Purpose |
-|---|---|---|
-| Homer | https://dash.116.203.149.96.nip.io | Dashboard homepage |
-| Uptime Kuma | https://status.116.203.149.96.nip.io | Service monitoring |
-| Pingvin Share | https://files.116.203.149.96.nip.io | File sharing |
-| Gitea | https://git.116.203.149.96.nip.io | Self-hosted Git server |
-| Vaultwarden | https://vault.116.203.149.96.nip.io | Password manager |
-| Portainer | https://portainer.116.203.149.96.nip.io | Docker management UI |
-| Grafana | https://grafana.116.203.149.96.nip.io | Metrics dashboards |
+Beszel: https://dash2.116.203.149.96.nip.io - CPU / RAM / disk / Docker container monitoring
+Homepage: https://home.116.203.149.96.nip.io - Dashboard / service homepage
+Vaultwarden: http://116.203.149.96:8080 - Password manager (not yet behind Nginx, exposed on raw port)
 
 ## Known Issues
 
-> ⚠️ **Homer dashboard shows "Not Secure" warning** — Homer loads over HTTPS but triggers a mixed content warning in the browser. The SSL certificate and nginx config are correct; the issue is caused by internal resource links. This is a known bug and will be fixed in a future update.
+Vaultwarden is exposed directly on port 8080, not yet routed through Nginx with TLS. Needs rebinding to 0.0.0.0 with UFW-only access plus an Nginx reverse-proxy config and cert, same pattern as Beszel/Homepage.
+
+tictactoe-web container is up on 127.0.0.1:5000 but the app itself isn't working correctly. Planned for a proper redesign/relaunch rather than a quick fix.
 
 ## Architecture
-```
-Internet → UFW Firewall (ports 80, 443, 22 only)
-               ↓
-           Nginx (reverse proxy)
-               ↓
-    ┌─────────────────────────────┐
-    │  Homer          :8082       │
-    │  Uptime Kuma    :3001       │
-    │  Pingvin Share  :3000       │
-    │  Gitea          :3002       │
-    │  Vaultwarden    :8080       │
-    │  Portainer      :9000       │
-    │  Grafana        :3003       │
-    │  Prometheus     :9090       │
-    └─────────────────────────────┘
-```
+
+Internet reaches the box through the UFW firewall, which only allows ports 80, 443 and 22 (plus 8080 currently, temporarily, for Vaultwarden). Everything that passes through 80/443 hits Nginx, which reverse-proxies by subdomain to the right container: Beszel on port 8090 and Homepage on port 3000. Vaultwarden on port 8080 currently bypasses Nginx entirely, reachable directly with no TLS. tictactoe-web sits on port 5000, bound to localhost only, and isn't currently working.
 
 ## Stack
 
-- **OS:** Ubuntu 24.04 LTS (Hetzner Cloud, Nuremberg)
-- **Docker** — all services run in isolated containers
-- **docker-compose** — each service defined and managed separately
-- **Nginx** — reverse proxy routing traffic via subdomains
-- **UFW** — firewall blocking everything except ports 22, 80, 443
-- **Fail2ban** — blocks IPs after 5 failed SSH attempts
-- **Swap file** — 2GB swap prevents RAM exhaustion crashes
-- **Makefile** — shortcuts for managing all services (`make up`, `make down`, `make status`)
-- **Healthchecks** — all services self-monitored with automatic restart on failure
+OS: Ubuntu 24.04 LTS (Hetzner Cloud, Nuremberg)
+Docker: all services run in isolated containers
+docker-compose: each service defined and managed separately
+Nginx: reverse proxy routing traffic via subdomains (nip.io wildcard DNS)
+Certbot: Let's Encrypt certs, issued per-subdomain via standalone mode
+UFW: firewall, default deny incoming, explicit allow list
+Fail2ban: blocks IPs after repeated failed SSH attempts
+Makefile: shortcuts for managing services
 
-## Running Locally
+## Services In Detail
 
-### Prerequisites
-- Docker & docker-compose
-- WSL2 (if on Windows)
+### Beszel
+System and Docker container monitoring: CPU, RAM, disk, network, per-container stats. Hub and agent run on the same host (agent uses network_mode: host). Bound to 0.0.0.0:8090 internally, not raw-exposed to the internet, since UFW blocks external access; only Nginx's container-to-host proxy path reaches it.
 
-### Start all services
-```bash
-git clone https://github.com/TeodorStS/homelab-stack.git
-cd homelab-stack
-cd uptime-kuma && docker compose up -d && cd ..
-cd nginx && docker compose up -d && cd ..
-cd pingvin && docker compose up -d && cd ..
-cd gitea && docker compose up -d && cd ..
-cd vaultwarden && docker compose up -d && cd ..
-cd portainer && docker compose up -d && cd ..
-cd homer && docker compose up -d && cd ..
-cd grafana-prometheus && docker compose up -d && cd ..
-```
+### Homepage
+Dashboard / service directory. Bound to 0.0.0.0:3000 internally, same exposure model as Beszel. Config lives in homepage/config/ (gitignored, may contain internal URLs/tokens).
 
-## Server Setup
+### Vaultwarden
+Password manager. Currently exposed directly on 0.0.0.0:8080, a known, intentional-for-now gap, next on the list to fix. Healthcheck was broken (configured to use wget, which the image doesn't ship) and has been fixed to use the image's own /healthcheck.sh script instead.
 
-On a fresh Ubuntu server:
-```bash
-# Add swap file first (prevents RAM crashes)
-sudo fallocate -l 2G /swapfile
-sudo chmod 600 /swapfile
-sudo mkswap /swapfile
-sudo swapon /swapfile
-echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+## Security Incident: Secrets Committed to Git History
 
-# Install Docker
-curl -fsSL https://get.docker.com | sudo sh
-sudo usermod -aG docker $USER
-newgrp docker
+Early in this repo's life, Vaultwarden's data directory (its encrypted SQLite database and RSA private key) was accidentally committed to this public repository, because .gitignore only excluded Gitea's and Pingvin's data folders, Vaultwarden's was missed.
 
-# Clone and start
-git clone https://github.com/TeodorStS/homelab-stack.git
+What was exposed: vaultwarden/data/db.sqlite3 (encrypted vault contents) and vaultwarden/data/rsa_key.pem (the instance's private key), across multiple historical commits, in a public repo.
 
-# Get SSL certificates (stop nginx first)
-cd nginx && docker compose down
-sudo certbot certonly --standalone \
-  -d vault.<SERVER_IP>.nip.io \
-  -d dash.<SERVER_IP>.nip.io \
-  -d status.<SERVER_IP>.nip.io \
-  -d files.<SERVER_IP>.nip.io \
-  -d git.<SERVER_IP>.nip.io \
-  -d portainer.<SERVER_IP>.nip.io \
-  -d grafana.<SERVER_IP>.nip.io \
-  --email your@email.com --agree-tos --non-interactive
-cd .. && make up
-```
+What was done about it:
+1. Stopped tracking the files going forward (git rm -r --cached vaultwarden/data, added to .gitignore)
+2. Rewrote git history entirely to remove the files from every past commit, using git-filter-repo --path vaultwarden/data --invert-paths --force
+3. Force-pushed the rewritten history to GitHub, replacing the exposed history
+4. Treated every credential stored in that vault as potentially compromised and rotated them, since a history rewrite cannot undo the fact the data was public for some period
 
-## Security
+Lesson: .gitignore needs to be set up before the first commit of any service with real credentials, not patched in after the fact.
 
-- UFW firewall — only ports 22, 80 and 443 exposed
-- Fail2ban — blocks brute force SSH attempts
-- Nginx reverse proxy — services never directly exposed to internet
-- Swap file — server degrades gracefully under load instead of crashing
-- SSH key authentication — password login disabled
+## Sensitive Data Handling
+
+The following are gitignored and must never be committed: vaultwarden/data/, beszel/data/, homepage/config/, .env files
 
 ## Roadmap
 
 ### Completed
-- [x] Deploy on real cloud server (Hetzner)
-- [x] Nginx reverse proxy with subdomain routing
-- [x] Uptime Kuma monitoring
-- [x] Pingvin Share file sharing
-- [x] Gitea self-hosted Git server
-- [x] Vaultwarden password manager
-- [x] Portainer Docker management UI
-- [x] Homer dashboard
-- [x] Grafana + Prometheus metrics
-- [x] UFW firewall hardening
-- [x] Fail2ban brute force protection
-- [x] 2GB swap file
-- [x] SSL certificates via Let's Encrypt (HTTPS for all services)
-- [x] Docker healthchecks on all services
-- [x] Pinned Docker image versions
-- [x] Makefile for service management
-- [x] Migrated from Azure (France Central) to Hetzner (Nuremberg)
+- Deployed on real cloud server (Hetzner)
+- Nginx reverse proxy with subdomain routing (nip.io + Let's Encrypt)
+- UFW firewall hardening
+- Fail2ban brute force protection
+- Cleaned up dead/unused services: Grafana, Prometheus, cAdvisor, Pingvin, Homer, Memos, Portainer, Uptime Kuma and Gitea all removed
+- Beszel set up for system and Docker monitoring
+- Homepage set up as the dashboard
+- Fixed Vaultwarden's healthcheck
+- Purged accidentally-committed Vaultwarden data and keys from git history, and rotated affected credentials
 
 ### Next Steps
-- [ ] Fix Homer mixed content / "Not Secure" warning
-- [ ] Add automated backups
-- [ ] Authelia — two factor authentication layer
-- [ ] Woodpecker CI + Gitea — full CI/CD pipeline
-- [ ] Nginx Proxy Manager — visual UI for managing reverse proxy
-- [ ] Migrate to permanent domain name
-- [ ] Upgrade to larger server for Grafana + cAdvisor
+- Move Vaultwarden behind Nginx
+- Fix or redesign tictactoe-web
+- Decide on a Gitea replacement or rework
+- Decide on a Memos replacement
+- Decide on an Uptime Kuma replacement
+- Decide on a Portainer replacement
+- Buy a real domain, migrate off nip.io subdomains
+- Build the portfolio site on the root domain once a domain is chosen
 
 ## What I Learned
 
 - How Docker containers and images work
 - How docker-compose manages multi-service stacks
 - What a reverse proxy is and why Nginx is used in production
-- How port mapping and Docker networking works on Linux vs Windows
+- How port mapping and Docker networking works, specifically why a service bound to 127.0.0.1 is invisible to other containers even on the same host
 - UFW firewall rules and fail2ban configuration
-- How to diagnose and fix server crashes (RAM exhaustion → swap file)
-- How to migrate a live server stack to a new cloud provider
-- How DNS routing works with subdomains
-- Resource management on constrained servers
 - How SSL certificates work with Let's Encrypt and nip.io
+- Why database files and private keys should never be committed to git, and how to purge them from history with git-filter-repo when they are
+- Diagnosing failing Docker healthchecks caused by a missing binary in the image, rather than assuming the app itself is broken
