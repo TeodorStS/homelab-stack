@@ -10,7 +10,7 @@ services:
     environment:
       - SIGNUPS_ALLOWED=false
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:80/alive || exit 1"]
+      test: ["CMD", "/healthcheck.sh"]
       interval: 30s
       timeout: 10s
       retries: 3
