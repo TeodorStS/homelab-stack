@@ -14,6 +14,8 @@ service management, and server hardening.
 | Homepage | https://home.116.203.149.96.nip.io | Dashboard / service homepage |
 | Vaultwarden | http://116.203.149.96:8080 | Password manager (not yet behind Nginx, exposed on raw port) |
 | It-toolkit | https://tools.116.203.149.96.nip.io/ | Usefull it tools |
+| Portfolio | https://portfolio.116.203.149.96.nip.io | Personal portfolio site (static, nginx container) |
+| Typetest | https://typetest.116.203.149.96.nip.io | Minimal typing test (static, nginx container) |
 
 ## Known Issues
 
@@ -22,7 +24,7 @@ service management, and server hardening.
 
 ## Architecture
 
-Internet reaches the box through the UFW firewall, which only allows ports 80, 443 and 22 (plus 8080 currently, temporarily, for Vaultwarden). Everything that passes through 80/443 hits Nginx, which reverse-proxies by subdomain to the right container: Beszel on port 8090 and Homepage on port 3000. Vaultwarden on port 8080 currently bypasses Nginx entirely, reachable directly with no TLS. tictactoe-web sits on port 5000, bound to localhost only, and isn't currently working.
+Internet reaches the box through the UFW firewall, which only allows ports 80, 443 and 22 (plus 8080 currently, temporarily, for Vaultwarden). Everything that passes through 80/443 hits Nginx, which reverse-proxies by subdomain to the right container: Beszel on port 8090, Homepage on port 3000, it-tools on 8091, Portfolio on 8092 and Typetest on 8093. Vaultwarden on port 8080 currently bypasses Nginx entirely, reachable directly with no TLS. tictactoe-web sits on port 5000, bound to localhost only, and isn't currently working.
 
 ## Stack
 
@@ -47,6 +49,18 @@ blocks external access; only Nginx's container-to-host proxy path reaches it.
 Dashboard / service directory. Bound to 0.0.0.0:3000 internally, same exposure
 model as Beszel. Config lives in homepage/config/ (gitignored, may contain
 internal URLs/tokens).
+
+### Portfolio
+Static site (plain HTML/CSS/JS) from github.com/TeodorStS/portfolio, built into an
+`nginx:alpine` image straight from the Git URL in `portfolio/docker-compose.yml`.
+Published on the Docker bridge only (`172.17.0.1:8092`), so it is reachable from the
+Nginx container but not from the internet. To redeploy after a change:
+
+    cd portfolio && docker compose build --no-cache && docker compose up -d
+
+### Typetest
+Static typing test from github.com/TeodorStS/typetest, same pattern as Portfolio
+(`172.17.0.1:8093`). Best scores are kept in the visitor's browser (localStorage).
 
 ### Vaultwarden
 Password manager. Currently exposed directly on 0.0.0.0:8080 — a known,
@@ -132,6 +146,7 @@ access to that port instead.
 - Fail2ban brute force protection
 - Cleaned up dead/unused services: Grafana, Prometheus, cAdvisor, Pingvin, Homer, Memos, Portainer, Uptime Kuma and Gitea all removed
 - Beszel set up for system and Docker monitoring
+- Portfolio and Typetest hosted as containers behind Nginx with Let's Encrypt certs
 - Homepage set up as the dashboard
 - Fixed Vaultwarden's healthcheck (wrong test command, not an app problem)
 - Purged accidentally-committed Vaultwarden data and keys from git history, and rotated affected credentials
@@ -144,7 +159,7 @@ access to that port instead.
 - Decide on an Uptime Kuma replacement
 - Decide on a Portainer replacement
 - Buy a real domain, migrate off nip.io subdomains
-- Build the portfolio site on the root domain once a domain is chosen
+- Move the portfolio to the root of the real domain (typetest and ttt on subdomains) once a domain is chosen
 
 ## What I Learned
 
