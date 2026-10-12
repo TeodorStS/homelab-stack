@@ -10,16 +10,23 @@ service management, and server hardening.
 
 | Service | URL | Purpose |
 |---|---|---|
-| Beszel | https://dash2.116.203.149.96.nip.io | CPU / RAM / disk / Docker container monitoring |
-| Homepage | https://home.116.203.149.96.nip.io | Dashboard / service homepage |
-| Vaultwarden | http://116.203.149.96:8080 | Password manager (not yet behind Nginx, exposed on raw port) |
-| It-toolkit | https://tools.116.203.149.96.nip.io/ | Usefull it tools |
-| Portfolio | https://portfolio.116.203.149.96.nip.io | Personal portfolio site (static, nginx container) |
-| Typetest | https://typetest.116.203.149.96.nip.io | Minimal typing test (static, nginx container) |
+| Portfolio | https://teodorstoyanov.dev | Personal portfolio site (static, nginx container) |
+| Typetest | https://typetest.teodorstoyanov.dev | Minimal typing test (static, nginx container) |
+| Homepage | https://home.teodorstoyanov.dev | Dashboard / service homepage |
+| Beszel | https://dash.teodorstoyanov.dev | CPU / RAM / disk / Docker container monitoring |
+| It-toolkit | https://tools.teodorstoyanov.dev | Useful IT tools |
+| Vaultwarden | https://vault2.116.203.149.96.nip.io | Password manager (behind Nginx; not yet moved to the new domain) |
+| Flappy Bird | https://flappy.cspp.ie | CS++ society recruitment game (lives on the society domain) |
+
+The old `*.116.203.149.96.nip.io` addresses for Beszel, Homepage, It-toolkit,
+Portfolio and Typetest still work alongside the new ones. `www.teodorstoyanov.dev`
+redirects to the root domain.
 
 ## Known Issues
 
-- Vaultwarden is exposed directly on port 8080, not yet routed through Nginx with TLS. Needs rebinding to 0.0.0.0 with UFW-only access plus an Nginx reverse-proxy config and cert, same pattern as Beszel/Homepage.
+- Vaultwarden is also published directly on port 8080 (Nginx proxies it at vault2.116.203.149.96.nip.io, but the raw port is still open). Close the raw port and move it to vault.teodorstoyanov.dev.
+- Certbot runs in standalone mode, which needs port 80, and the Nginx container holds it, so automatic renewals will fail. Add pre/post renewal hooks that stop and start Nginx.
+- The Beszel agent TOKEN is committed in beszel/docker-compose.yml. Rotate it and move it to an untracked .env file.
 - tictactoe-web container is up on 127.0.0.1:5000 but the app itself isn't working correctly. Planned for a proper redesign/relaunch rather than a quick fix.
 
 ## Architecture
@@ -31,7 +38,7 @@ Internet reaches the box through the UFW firewall, which only allows ports 80, 4
 - OS: Ubuntu 24.04 LTS (Hetzner Cloud, Nuremberg)
 - Docker: all services run in isolated containers
 - docker-compose: each service defined and managed separately
-- Nginx: reverse proxy routing traffic via subdomains (nip.io wildcard DNS)
+- Nginx: reverse proxy routing traffic by hostname (teodorstoyanov.dev subdomains, plus legacy nip.io)
 - Certbot: Let's Encrypt certs, issued per-subdomain via standalone mode
 - UFW: firewall, default deny incoming, explicit allow list
 - Fail2ban: blocks IPs after repeated failed SSH attempts
@@ -147,6 +154,7 @@ access to that port instead.
 - Cleaned up dead/unused services: Grafana, Prometheus, cAdvisor, Pingvin, Homer, Memos, Portainer, Uptime Kuma and Gitea all removed
 - Beszel set up for system and Docker monitoring
 - Portfolio and Typetest hosted as containers behind Nginx with Let's Encrypt certs
+- Real domain (teodorstoyanov.dev) registered; Portfolio, Typetest, Homepage, Beszel and It-toolkit moved onto it
 - Homepage set up as the dashboard
 - Fixed Vaultwarden's healthcheck (wrong test command, not an app problem)
 - Purged accidentally-committed Vaultwarden data and keys from git history, and rotated affected credentials
@@ -158,8 +166,8 @@ access to that port instead.
 - Decide on a Memos replacement
 - Decide on an Uptime Kuma replacement
 - Decide on a Portainer replacement
-- Buy a real domain, migrate off nip.io subdomains
-- Move the portfolio to the root of the real domain (typetest and ttt on subdomains) once a domain is chosen
+- Move Vaultwarden and Tic-Tac-Toe to the new domain, then retire the old nip.io addresses
+- Fix certificate auto-renewal (standalone mode vs the Nginx container on port 80)
 
 ## What I Learned
 
