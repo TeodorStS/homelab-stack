@@ -1,0 +1,7 @@
+services:
+  typetest:
+    build: https://github.com/TeodorStS/typetest.git#main
+    container_name: typetest
+    restart: unless-stopped
+    ports:
+      - "172.17.0.1:8093:80"

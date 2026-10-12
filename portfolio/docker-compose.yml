@@ -1,0 +1,7 @@
+services:
+  portfolio:
+    build: https://github.com/TeodorStS/portfolio.git#main
+    container_name: portfolio
+    restart: unless-stopped
+    ports:
+      - "172.17.0.1:8092:80"
