@@ -1,0 +1,33 @@
+- Projects:
+    - Portfolio:
+        icon: mdi-account-circle-outline
+        href: https://teodorstoyanov.dev
+        target: _blank
+        description: Projects, experience and skills
+    - jumpflip:
+        icon: mdi-bird
+        href: https://flappy.cspp.ie
+        target: _blank
+        description: Flappy Bird-style recruitment game for the CS++ Society. 1,500+ games played.
+    - Tic-Tac-Toe:
+        icon: mdi-grid
+        href: https://tictactoe.teodorstoyanov.dev
+        target: _blank
+        description: Play against an unbeatable minimax AI (Flask API, Docker).
+    - Typetest:
+        icon: mdi-keyboard-outline
+        href: https://typetest.teodorstoyanov.dev
+        target: _blank
+        description: Monkeytype-style typing test with 30 themes.
+
+- Tools:
+    - IT Tools:
+        icon: mdi-wrench-outline
+        href: https://tools.teodorstoyanov.dev
+        target: _blank
+        description: Handy utilities for developers.
+    - homelab-stack:
+        icon: si-github
+        href: https://github.com/TeodorStS/homelab-stack
+        target: _blank
+        description: How this server is built. Docker, Nginx, Certbot, UFW.

@@ -1,0 +1,26 @@
+# Public-safe Homepage config, styled to match teodorstoyanov.dev.
+# Copy these files into homepage/config/ (which is gitignored) on the server.
+title: Teodor Stoyanov · homelab
+description: Building software, and the infrastructure it runs on.
+headerStyle: clean
+theme: light
+color: slate
+cardBlur: ""
+hideVersion: true
+useEqualHeights: true
+
+layout:
+  Projects:
+    style: row
+    columns: 4
+    icon: mdi-hammer-wrench
+  Tools:
+    style: row
+    columns: 2
+    icon: mdi-toolbox-outline
+  Find me:
+    style: row
+    columns: 2
+  Source:
+    style: row
+    columns: 2

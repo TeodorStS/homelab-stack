@@ -1,0 +1,63 @@
+/* Matches the portfolio: warm paper, seafoam accent, Fraunces / Inter / JetBrains Mono */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+
+:root, html.light {
+  --bg: #faf8f3;
+  --panel: #ffffff;
+  --ink: #1c2b28;
+  --muted: #5e6d69;
+  --line: #e6e0d3;
+  --mint: #2fb39c;
+  --mint-deep: #0e8474;
+  --mint-soft: #ddf2ec;
+  --shadow: 0 2px 6px rgba(28,43,40,.05), 0 14px 34px rgba(28,43,40,.07);
+  --shadow-hover: 0 4px 10px rgba(28,43,40,.06), 0 22px 44px rgba(28,43,40,.1);
+}
+html.dark {
+  --bg: #0f1614;
+  --panel: #18221f;
+  --ink: #e4ece8;
+  --muted: #93a39e;
+  --line: #26332f;
+  --mint: #3cc9b0;
+  --mint-deep: #5fd6c0;
+  --mint-soft: #16302a;
+  --shadow: 0 2px 6px rgba(0,0,0,.25), 0 14px 34px rgba(0,0,0,.3);
+  --shadow-hover: 0 4px 10px rgba(0,0,0,.3), 0 22px 44px rgba(0,0,0,.4);
+}
+
+body, #__next, #page_wrapper, #page_container {
+  background: var(--bg) !important;
+  color: var(--ink) !important;
+  font-family: "Inter", system-ui, sans-serif !important;
+}
+
+/* headings: the serif display face, like the portfolio */
+h1, h2, h3, .service-group-name, .bookmark-group-name, #information-widgets h1 {
+  font-family: "Fraunces", Georgia, serif !important;
+  color: var(--ink) !important;
+  letter-spacing: -0.01em;
+}
+
+/* cards */
+.service-card, .bookmark, #information-widgets .information-widget-resource {
+  background: var(--panel) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow) !important;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.service-card:hover, .bookmark:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover) !important;
+  border-color: var(--mint) !important;
+}
+.service-name, .service-title, .bookmark-text { color: var(--ink) !important; font-weight: 600; }
+.service-description, .service-card p { color: var(--muted) !important; }
+
+/* mono accents */
+.service-description, #information-widgets, .information-widget-datetime {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .8rem;
+}
+a { color: var(--mint-deep); }
