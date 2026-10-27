@@ -1,7 +1,9 @@
 gitea/data/
 pingvin/data/
-vaultwarden/data/
 beszel/data/
 beszel/beszel_agent_data/
 homepage/config/
 .env
+tictactoe/tic-tac-toe/
+**/data/
+**/mysql/

@@ -15,7 +15,6 @@ service management, and server hardening.
 | Homepage | https://home.teodorstoyanov.dev | Dashboard / service homepage |
 | Beszel | https://dash.teodorstoyanov.dev | CPU / RAM / disk / Docker container monitoring |
 | It-toolkit | https://tools.teodorstoyanov.dev | Useful IT tools |
-| Vaultwarden | https://vault2.116.203.149.96.nip.io | Password manager (behind Nginx; not yet moved to the new domain) |
 | Flappy Bird | https://flappy.cspp.ie | CS++ society recruitment game (lives on the society domain) |
 
 The old `*.116.203.149.96.nip.io` addresses for Beszel, Homepage, It-toolkit,
@@ -24,14 +23,13 @@ redirects to the root domain.
 
 ## Known Issues
 
-- Vaultwarden is also published directly on port 8080 (Nginx proxies it at vault2.116.203.149.96.nip.io, but the raw port is still open). Close the raw port and move it to vault.teodorstoyanov.dev.
 - Certbot runs in standalone mode, which needs port 80, and the Nginx container holds it, so automatic renewals will fail. Add pre/post renewal hooks that stop and start Nginx.
 - The Beszel agent TOKEN is committed in beszel/docker-compose.yml. Rotate it and move it to an untracked .env file.
 - tictactoe-web container is up on 127.0.0.1:5000 but the app itself isn't working correctly. Planned for a proper redesign/relaunch rather than a quick fix.
 
 ## Architecture
 
-Internet reaches the box through the UFW firewall, which only allows ports 80, 443 and 22 (plus 8080 currently, temporarily, for Vaultwarden). Everything that passes through 80/443 hits Nginx, which reverse-proxies by subdomain to the right container: Beszel on port 8090, Homepage on port 3000, it-tools on 8091, Portfolio on 8092 and Typetest on 8093. Vaultwarden on port 8080 currently bypasses Nginx entirely, reachable directly with no TLS. tictactoe-web sits on port 5000, bound to localhost only, and isn't currently working.
+Internet reaches the box through the UFW firewall, which only allows ports 80, 443 and 22. Everything that passes through 80/443 hits Nginx, which reverse-proxies by subdomain to the right container: Beszel on port 8090, Homepage on port 3000, it-tools on 8091, Portfolio on 8092 and Typetest on 8093. tictactoe-web sits on port 5000, bound to localhost only, and isn't currently working.
 
 ## Stack
 
@@ -69,12 +67,6 @@ Nginx container but not from the internet. To redeploy after a change:
 Static typing test from github.com/TeodorStS/typetest, same pattern as Portfolio
 (`172.17.0.1:8093`). Best scores are kept in the visitor's browser (localStorage).
 
-### Vaultwarden
-Password manager. Currently exposed directly on 0.0.0.0:8080 — a known,
-intentional-for-now gap, next on the list to fix. Healthcheck was broken
-(configured to use wget, which the image doesn't ship) and has been fixed to
-use the image's own /healthcheck.sh script instead.
-
 ## Security Incident: Secrets Committed to Git History
 
 Early in this repo's life, Vaultwarden's data directory (its encrypted SQLite
@@ -92,6 +84,9 @@ What was done about it:
 3. Force-pushed the rewritten history to GitHub, replacing the exposed history
 4. Treated every credential stored in that vault as potentially compromised and rotated them, since a history rewrite cannot undo the fact the data was public for some period
 
+Vaultwarden has since been removed from the server entirely: I wasn't using it, and a
+password manager on a public IP is a high-value target for no benefit.
+
 Lesson: `.gitignore` needs to be set up **before** the first commit of any
 service with real credentials, not patched in after the fact. A safer pattern
 going forward is a repo-wide rule excluding all `*/data/` directories by
@@ -100,7 +95,7 @@ default, rather than an allow-list of specific folders.
 ## Sensitive Data Handling
 
 The following are gitignored and must never be committed:
-- `vaultwarden/data/`
+- every `*/data/` directory (blanket rule)
 - `beszel/data/`
 - `homepage/config/`
 - `.env` files
@@ -115,7 +110,6 @@ Clone the repo, then bring up whichever service you need:
     cd homelab-stack
     cd beszel && docker compose up -d && cd ..
     cd homepage && docker compose up -d && cd ..
-    cd vaultwarden && docker compose up -d && cd ..
 
 ## Server Setup Notes
 
@@ -156,17 +150,16 @@ access to that port instead.
 - Portfolio and Typetest hosted as containers behind Nginx with Let's Encrypt certs
 - Real domain (teodorstoyanov.dev) registered; Portfolio, Typetest, Homepage, Beszel and It-toolkit moved onto it
 - Homepage set up as the dashboard
-- Fixed Vaultwarden's healthcheck (wrong test command, not an app problem)
 - Purged accidentally-committed Vaultwarden data and keys from git history, and rotated affected credentials
+- Removed Vaultwarden (unused) to reduce the attack surface
 
 ### Next Steps
-- Move Vaultwarden behind Nginx: rebind to 0.0.0.0, add a subdomain and cert, close the raw UFW port 8080
 - Fix or redesign tictactoe-web
 - Decide on a Gitea replacement or rework
 - Decide on a Memos replacement
 - Decide on an Uptime Kuma replacement
 - Decide on a Portainer replacement
-- Move Vaultwarden and Tic-Tac-Toe to the new domain, then retire the old nip.io addresses
+- Move Tic-Tac-Toe to the new domain, then retire the old nip.io addresses
 - Fix certificate auto-renewal (standalone mode vs the Nginx container on port 80)
 
 ## What I Learned
